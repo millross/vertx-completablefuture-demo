@@ -19,7 +19,11 @@ public class AlreadyCompletedFutureTest {
         final CompletableFuture<Integer> intFuture = CompletableFuture.completedFuture(1);
         intFuture
                 .thenApply(i -> i + 4)
-                .thenAccept(i -> System.out.println(i));
+                .thenAccept(System.out::println);
+
+        intFuture
+                .thenApply(i -> i + 6)
+                .thenAccept(System.out::println);
     }
 
 }
