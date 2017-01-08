@@ -93,4 +93,30 @@ public class BlockingDelayedCompletionTest {
         });
     }
 
+    @Test
+    public void testBlockingDelayedUsingWrapper(TestContext context) {
+        final Async async = context.async();
+        final Vertx vertx = rule.vertx();
+
+        // delay future completion by 500 ms
+        final String threadName = Thread.currentThread().getName();
+
+        final BlockingComputationWrapper wrapper = new BlockingComputationWrapper(vertx);
+        final CompletableFuture<Integer> toComplete = wrapper.fromBlockingComputation(() -> {
+            try {
+                Thread.sleep(1000);
+                return 500;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+
+        });
+
+        toComplete.thenRun(() -> {
+            assertThat(Thread.currentThread().getName(), is(threadName));
+            async.complete();
+        });
+    }
+
 }
